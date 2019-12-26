@@ -25,4 +25,4 @@ async def random_sleepers(n: int = 10):
 
 @app.get('/')
 async def sleepy():
-    await random_sleepers()
+    return await random_sleepers()

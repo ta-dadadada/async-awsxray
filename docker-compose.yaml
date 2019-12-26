@@ -1,0 +1,32 @@
+version: "3.7"
+services:
+  app:
+    container_name: app
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+    depends_on:
+      - xray
+    networks:
+      - xraynetwork
+    ports:
+      - "5000:5000"
+
+  xray:
+    container_name: xray
+    build:
+      context: .
+      dockerfile: docker/xray/Dockerfile
+    environment:
+      AWS_REGION: us-east-2
+    ports:
+      - "2000:2000/udp"
+    command:
+      - "-o"
+    networks:
+      - xraynetwork
+    volumes:
+      - "~/.aws/:/root/.aws/:ro"
+
+networks:
+  xraynetwork:
