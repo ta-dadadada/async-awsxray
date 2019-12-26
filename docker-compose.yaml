@@ -6,6 +6,7 @@ services:
       context: .
       dockerfile: docker/app/Dockerfile
     depends_on:
+      - db
       - xray
     environment:
       DAEMON_ADDRESS: "xray:2000"
@@ -14,6 +15,23 @@ services:
       - "debug"
     ports:
       - "5000:5000"
+
+  db:
+    image: mysql:5.7
+    container_name: db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: test
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+      TZ: 'Asia/Tokyo'
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+    - ./docker/db/data:/var/lib/mysql
+    - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
+    - ./docker/db/sql:/docker-entrypoint-initdb.d
+    ports:
+    - 3306:3306
 
   xray:
     container_name: xray
