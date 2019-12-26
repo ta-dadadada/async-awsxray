@@ -11,6 +11,7 @@ aws-xray-sdk = "*"
 boto3 = "*"
 databases = {extras = ["mysql"],version = "*"}
 uvicorn = "*"
+requests-async = "*"
 
 [requires]
 python_version = "3.7"

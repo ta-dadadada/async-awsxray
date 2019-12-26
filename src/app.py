@@ -1,4 +1,5 @@
 import asyncio
+import requests_async
 from fastapi import FastAPI
 from starlette.responses import JSONResponse
 from src.tracing import recorder, TracingMiddleware
@@ -7,17 +8,25 @@ app = FastAPI()
 app.add_middleware(TracingMiddleware)
 
 
-async def async_sleep(t: float, name: str):
+async def async_sleep(t: float):
     async with recorder.in_subsegment_async('async_sleep'):
         await asyncio.sleep(t)
-    print(f'{name} sleep {t}s')
     return t
 
 
 async def _random_sleepers(n: int):
     from random import random
-    works = [async_sleep(random(), str(i)) for i in range(n)]
+    works = [async_sleep(random()) for _ in range(n)]
     return await asyncio.gather(*works)
+
+
+async def ok_google():
+    async def _ok_google():
+        async with recorder.in_subsegment_async('_ok_google'):
+            return requests_async.get('https://www.google.com/')
+    async with recorder.in_subsegment_async('ok_google'):
+        works = [_ok_google() for _ in range(4)]
+        return await asyncio.gather(*works)
 
 
 async def random_sleepers(n: int = 10):
@@ -29,4 +38,5 @@ async def random_sleepers(n: int = 10):
 
 @app.get('/')
 async def sleepy():
-    return await random_sleepers()
+    results = await asyncio.gather(random_sleepers(), ok_google())
+    return results[0]
