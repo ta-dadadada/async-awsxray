@@ -9,6 +9,9 @@ services:
       - xray
     networks:
       - xraynetwork
+    command:
+      - "--log-level"
+      - "debug"
     ports:
       - "5000:5000"
 
@@ -18,7 +21,8 @@ services:
       context: .
       dockerfile: docker/xray/Dockerfile
     environment:
-      AWS_REGION: us-east-2
+      AWS_REGION: ap-northeast-1
+      AWS_PROFILE: "ta-da"
     ports:
       - "2000:2000/udp"
     command:
